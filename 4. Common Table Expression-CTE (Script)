@@ -1,4 +1,4 @@
-# Use CTE to find how many 
+# Use CTE tenique to find how many of the top 5 customers based within the top 5 countries.
 WITH top_ten_countries AS (
         	SELECT D.country
         	FROM customer A
