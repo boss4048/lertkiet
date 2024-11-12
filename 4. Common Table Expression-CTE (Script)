@@ -1,0 +1,51 @@
+# Use CTE to find how many 
+WITH top_ten_countries AS (
+        	SELECT D.country
+        	FROM customer A
+        	INNER JOIN address B ON A.address_id = B.address_id
+        	INNER JOIN city C ON B.city_id = C.city_id
+        	INNER JOIN country D ON C.country_id = D.country_id
+        	GROUP BY D.country
+        	ORDER BY COUNT(customer_id) DESC
+        	LIMIT 10 ),
+
+top_ten_cities AS (
+        	SELECT D.country, C.city
+        	FROM customer A
+        	INNER JOIN address B ON A.address_id = B.address_id
+        	INNER JOIN city C ON B.city_id = C.city_id
+        	INNER JOIN country D ON C.country_id = D.country_id
+        	WHERE D.country IN (SELECT * FROM top_ten_countries)
+        	GROUP BY D.country, C.city
+        	ORDER BY COUNT(customer_id) DESC
+        	LIMIT 10),
+
+top_five_customers AS (
+        	SELECT E.customer_id, 
+                 A.first_name, 
+                 A.last_name, 
+                 C.city, 
+                 D.country,
+        		     SUM(E.amount) AS Total_Amount_Paid
+        	FROM customer A
+        	INNER JOIN address B ON A.address_id = B.address_id
+        	INNER JOIN city C ON B.city_id = C.city_id
+        	INNER JOIN country D ON C.country_id = D.country_id
+        	INNER JOIN payment E ON A.customer_id = E.customer_id
+        	WHERE (D.country,C.city) IN (SELECT * FROM top_ten_cities)			
+        	GROUP BY E.customer_id, A.first_name, A.last_name, C.city, D.country
+        	ORDER BY Total_Amount_Paid DESC
+        	LIMIT 5)
+
+SELECT 
+        	K.country,
+        	COUNT(DISTINCT H.customer_id) AS all_customer_count,
+        	COUNT(DISTINCT top_five_customers.customer_id)  AS top_5_customers_count
+FROM customer H
+          INNER JOIN address I ON H.address_id = I.address_id
+          INNER JOIN city J ON I.city_id = J.city_id
+          INNER JOIN country K ON J.country_id = K.country_id
+          LEFT JOIN top_five_customers ON H.customer_id = top_five_customers.customer_id
+GROUP BY K.country
+HAVING COUNT(DISTINCT top_five_customers.customer_id) > 0
+ORDER BY all_customer_count DESC
