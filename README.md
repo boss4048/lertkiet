@@ -21,4 +21,4 @@ Here are the main questions they’d like to answer
 3. Tableau (Visualization)
 4. Microsoft Powerpoint (Presentation)
 
-View visualizations here: 
+View visualizations here: [Visualizations on Tableau Public](https://public.tableau.com/app/profile/lertkiet.lertchayantee/viz/SummaryVisualization/Story1?publish=yes)
